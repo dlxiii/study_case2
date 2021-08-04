@@ -1111,7 +1111,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
             save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
         elseif develop_mode == 2
     		fprintf('Loading GWO forcing from the local database...');
-        	load([inputConf.outbase,'forcing_gwo.mat']);
+        	load('forcing_gwo.mat');
             save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
         	fprintf('Done!\n');
         end
