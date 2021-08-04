@@ -1,0 +1,93 @@
+forward projecting to get (x,y)
+Estimated time step:	10.58
+forward projecting to get (x,y)
+Estimated time step:	10.58
+load([inputConf.outbase,'forcing_gwo_inter_air.mat']); forcing_gwo_interp.air = forcing_gwo_inter_air.air; clear forcing_gwo_inter_air;
+        load([inputConf.outbase,'forcing_gwo_inter_cld.mat']); forcing_gwo_interp.cld = forcing_gwo_inter_cld.cld; clear forcing_gwo_inter_cld;
+        load([inputConf.outbase,'forcing_gwo_inter_dsw.mat']); forcing_gwo_interp.dsw = forcing_gwo_inter_dsw.dsw; clear forcing_gwo_inter_dsw;
+        load([inputConf.outbase,'forcing_gwo_inter_hum.mat']); forcing_gwo_interp.hum = forcing_gwo_inter_hum.hum; clear forcing_gwo_inter_hum;
+        load([inputConf.outbase,'forcing_gwo_inter_prs.mat']); forcing_gwo_interp.prs = forcing_gwo_inter_prs.prs; clear forcing_gwo_inter_prs;
+        load([inputConf.outbase,'forcing_gwo_inter_rin.mat']); forcing_gwo_interp.rin = forcing_gwo_inter_rin.rin; clear forcing_gwo_inter_rin;
+        load([inputConf.outbase,'forcing_gwo_inter_wnd.mat']); 
+        forcing_gwo_interp.uwnd = forcing_gwo_inter_wnd.uwnd; 
+        forcing_gwo_interp.vwnd = forcing_gwo_inter_wnd.vwnd; 
+        forcing_gwo_interp.time = forcing_gwo_inter_wnd.time;
+        forcing_gwo_interp.lon  = forcing_gwo_inter_wnd.lon; 
+        forcing_gwo_interp.lat  = forcing_gwo_inter_wnd.lat; 
+        forcing_gwo_interp.x    = forcing_gwo_inter_wnd.x; 
+        forcing_gwo_interp.y    = forcing_gwo_inter_wnd.y; 
+        clear forcing_gwo_inter_wnd;
+save([inputConf.outbase,'forcing_gwo_interp.mat'],'forcing_gwo_interp','-v7.3','-nocompression');
+write_FVCOM_gwo_forcing(Mobj, ...
+        forcing_gwo_interp, ...
+        fullfile(inputConf.outbase,[inputConf.casename]),...
+        [inputConf.doForcing, ' atmospheric forcing data'],...
+        inputConf.FVCOM_version, ...
+        'floattime', true,...
+        'julian', true);
+write : air... 
+write : cld... 
+write : dsw... 
+write : hum... 
+write : prs... 
+write : rin... 
+write : uwnd... 
+write : vwnd... 
+    fprintf('Writing meteorological forcing file...done!\n');
+Writing meteorological forcing file...done!
+    clear forcing_gwo forcing_gwo_interp;
+Mobj.gwo.time = inputConf.forceMJD';
+save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
+fprintf('Loading Model objet file...\n')
+Loading Model objet file...
+        load([inputConf.outbase,'varb/Mobj_02.mat']);
+        fprintf('Done!\n');
+Done!
+Mobj.gwo.time = inputConf.forceMJD';
+save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
+        	fprintf('Done!\n');
+Done!
+addpath([basedir2,'paper_case2/fvcom_inp/datasets/']);
+    addpath([basedir2,'paper_case2/fvcom_inp/datasets/gwo/']);
+    addpath([basedir2,'paper_case2/fvcom_inp/datasets/RiverDischarge/']);
+[Warning: Name is nonexistent or not a directory:
+/Volumes/Yulong/GitHub/paper_case2/fvcom_inp/datasets/RiverDischarge] 
+[> In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('path', '/Applications/MATLAB_R2019a.app/toolbox/matlab/general/path.m', 109)" style="font-weight:bold">path</a> (<a href="matlab: opentoline('/Applications/MATLAB_R2019a.app/toolbox/matlab/general/path.m',109,0)">line 109</a>)
+  In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('addpath', '/Applications/MATLAB_R2019a.app/toolbox/matlab/general/addpath.m', 86)" style="font-weight:bold">addpath</a> (<a href="matlab: opentoline('/Applications/MATLAB_R2019a.app/toolbox/matlab/general/addpath.m',86,0)">line 86</a>)] 
+addpath([basedir2,'paper_case2/fvcom_inp/datasets/']);
+    addpath([basedir2,'paper_case2/fvcom_inp/datasets/gwo/']);
+    addpath([basedir2,'paper_case2/fvcom_inp/datasets/RiverDischarge/']);
+forward projecting to get (x,y)
+Estimated time step:	10.58
+forward projecting to get (x,y)
+Estimated time step:	10.58
+write_SMS_2dm([inputConf.casename,'_grd.2dm'], Mobj.tri, Mobj.x, Mobj.y);
+{Not enough input arguments.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('write_SMS_2dm', '/Users/yulong/GitHub/fvcomtoolbox/utilities/write_SMS_2dm.m', 64)" style="font-weight:bold">write_SMS_2dm</a> (<a href="matlab: opentoline('/Users/yulong/GitHub/fvcomtoolbox/utilities/write_SMS_2dm.m',64,0)">line 64</a>)
+    fprintf(f, 'ND %i %.8e %.8e %.8e\n', n, x(n), y(n), z(n));
+} 
+write_SMS_2dm([inputConf.casename,'_grd.2dm'], Mobj.tri, Mobj.x, Mobj.y, Mobj.h);
+[inputConf.casename,'_grd.2dm']
+
+ans =
+
+    'tokyobay_grd.2dm'
+
+write_SMS_2dm([inputConf.casename,'_grd.2dm'], Mobj.tri, Mobj.x, Mobj.y, Mobj.h);
+write_SMS_2dm(fullfile(inputConf.outbase,[inputConf.casename,'_grd.2dm']), Mobj.tri, Mobj.x, Mobj.y, Mobj.h);
+Reading river forcing file...
+WARNING: River time begin from 2014-01-01 00:00:00
+Done!
+Writing river forcing file...
+Done!
+Reading river forcing file...
+WARNING: River time begin from 2014-01-01 00:00:00
+Done!
+Writing river forcing file...
+Done!
+Reading river forcing file...
+WARNING: River time begin from 2014-01-01 00:00:00
+Done!
+Writing river forcing file...
+Done!
