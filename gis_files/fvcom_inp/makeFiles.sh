@@ -14,8 +14,8 @@
 #sh ./makeFile.sh
 #cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0303/inp
 #sh ./makeFile.sh
-cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0304/inp
-sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0304/inp
+#sh ./makeFile.sh
 #cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1001/inp
 #sh ./makeFile.sh
 #cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1002/inp
