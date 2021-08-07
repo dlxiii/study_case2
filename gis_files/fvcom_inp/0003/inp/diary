@@ -3169,4 +3169,162 @@ of the parfor loop.
 Any value assigned to it before the loop will be lost.  If xxalt is used before
 it is assigned in the parfor loop, a runtime error will occur.
 See Parallel for Loops in MATLAB, "Temporary Variables".] 
-[Warning
+[Warning: File: /Users/yulong/GitHub/fvcomtoolbox/utilities/grid2fvcom.m Line:
+275 Column: 25
+The temporary variable yyalt will be cleared at the beginning of each iteration
+of the parfor loop.
+Any value assigned to it before the loop will be lost.  If yyalt is used before
+it is assigned in the parfor loop, a runtime error will occur.
+See Parallel for Loops in MATLAB, "Temporary Variables".] 
+[Warning: File: /Users/yulong/GitHub/fvcomtoolbox/utilities/grid2fvcom.m Line:
+291 Column: 44
+The temporary variable ftsin will be cleared at the beginning of each iteration
+of the parfor loop.
+Any value assigned to it before the loop will be lost.  If ftsin is used before
+it is assigned in the parfor loop, a runtime error will occur.
+See Parallel for Loops in MATLAB, "Temporary Variables".] 
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of air complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of cld complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of dsw complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of hum complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of prs complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of uwnd complete
+interpolation of vwnd complete
+
+begin : grid2fvcom 
+number of nodes: 6027
+number of elems: 10400
+transferring variable time as is
+reassigning variable lon from unstructured grid
+reassigning variable lat from unstructured grid
+reassigning variable x from unstructured grid
+reassigning variable y from unstructured grid
+interpolation of rin complete
+write : air... 
+write : cld... 
+write : dsw... 
+write : hum... 
+write : prs... 
+write : rin... 
+write : uwnd... 
+write : vwnd... 
+Writing meteorological forcing file...done!
+IdleTimeout has been reached.
+Parallel pool using the 'local' profile is shutting down.
+%%
+%%%------------------------------------------------------------------------
+%%%                     River discharge and output
+%%%------------------------------------------------------------------------
+% FVCOM river.
+if strcmpi(inputConf.riverForcing, 'FLUX')
+    if develop_mode == 3
+    	fprintf('Loading Model objet file...')
+        load([inputConf.outbase,'varb/Mobj_04.mat']);
+        fprintf('Done!\n');
+    else
+        fprintf('Reading river forcing file...');
+        Mobj = get_COSTUM_river_location(inputConf, Mobj);
+        Mobj = get_COSTUM_river_variable(Mobj, ...
+            {inputConf.river.flux,inputConf.river.temp,inputConf.river.salt}, ...
+            {'flux','temp','salt'},...
+            inputConf.river.infos,...
+            'time', true);
+        Mobj.nRivers = Mobj.river.number;
+        inc = 1;
+        Mobj.rivermouth = cell(1); % don't preallocate as we don't know how many we'll have
+        for s = 1:Mobj.nRivers
+            [node, ~] = find_nearest_pt(Mobj.river.location(s, 3), Mobj.river.location(s, 4), Mobj);
+            [~, elem] = min(abs(sqrt((Mobj.xc - Mobj.river.location(s, 3)).^2 + Mobj.yc - Mobj.river.location(s, 4)).^2));
+            Mobj.rivermouth{inc} = {inc, Mobj.river.location(s, 3), Mobj.river.location(s, 4), node, Mobj.h(node), Mobj.river.name(s), elem};
+            riverList(s,1) = Mobj.rivermouth{inc}(1,4);
+            Mobj.riverList = cell2mat(riverList);
+            inc = inc + 1;
+        end
+        clear node elem inc s
+        Mobj = add_river_nodes_list(Mobj,Mobj.riverList,Mobj.river.name,1);
+        save([inputConf.outbase,'varb/Mobj_04.mat'],'Mobj','-v7.3','-nocompression');
+        fprintf('Done!\n');
+        clear riverList;
+    end
+    % river file
+    fprintf('Writing river forcing file...\n');
+    write_FVCOM_river(fullfile(inputConf.outbase,...
+        [inputConf.casename,'_river.nc']),...
+         inputConf.river.infos,...
+         Mobj.river.timeMJD,...
+         Mobj.river.flux,...
+         Mobj.river.temp -3.0,...
+         Mobj.river.salt,...
+        'Tokyo Bay rivers',...
+        'Model river boundary input');
+    write_FVCOM_river_nml(Mobj, ...
+        fullfile(inputConf.outbase,'rivers_namelist.nml'), ...
+        [inputConf.casename,'_river.nc'],...
+        '''uniform''');
+    fprintf('Done!\n');
+end
+Reading river forcing file...
+WARNING: River time begin from 2014-01-01 00:00:00
+Done!
+Writing river forcing file...
+Done!
+
+%%
+clear ans tpxo_dir
+fprintf('All done!\n')
+All done!
+diary off;
