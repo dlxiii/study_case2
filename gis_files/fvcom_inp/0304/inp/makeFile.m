@@ -57,7 +57,7 @@ elseif ispc     % Or Windows?
 end
 
 % Output directory: dat and nc files.
-inputConf.outbase = [basedir2,'paper_case2/fvcom_inp/0404/inp/'];
+inputConf.outbase = [basedir2,'paper_case2/fvcom_inp/0304/inp/'];
 
 % Write out all the required files.
 % Make the output directory if it doesnt exist
@@ -88,7 +88,7 @@ inputConf.FVCOM_version = '4.1';
 
 % Location of grads file
 inputConf.grid = [basedir,'/study_case2/gis_files/opmeshes/',...
-    'dem_04_04_regeneration.14'];
+    'dem_03_04_regeneration.14'];
 
 %%%------------------------------------------------------------------------
 %%%                           Spatial stuff
