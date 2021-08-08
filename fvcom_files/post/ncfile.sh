@@ -12,3 +12,6 @@ ulimit -a
 
 matlab -nodisplay < ncfile_01.m
 matlab -nodisplay < ncfile_02.m
+matlab -nodisplay < ncfile.m
+matlab -nodisplay < waterage.m
+matlab -nodisplay < waterage2csv.m

@@ -20,13 +20,16 @@ do
     cp ../../post/ncfile_02.m ncfile_02.m
     cp ../../post/ncfile.m ncfile.m
     cp ../../post/ncfile.sh ncfile.sh
+    cp ../../post/waterage.m waterage.m
+    cp ../../post/waterage2csv.m waterage2csv.m
 
     echo "[INFO] Reading NC file ..."
     pjsub ./ncfile.sh
     # matlab -nodisplay < ncfile_01.m
     # matlab -nodisplay < ncfile_02.m
-    matlab -nodisplay < ncfile.m
-    matlab -nodisplay < waterage.m
+    # matlab -nodisplay < ncfile.m
+    # matlab -nodisplay < waterage.m
+    # matlab -nodisplay < waterage2csv.m
 
     cd ../../post
 done

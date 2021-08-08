@@ -6,7 +6,7 @@ delete('diary')
 diary on;
 % Which system am I using?
 if ismac        % On Mac
-    basedir = '/home/usr0/n70110d/';
+    basedir = '/Users/yulong/GitHub/';
     addpath([basedir,'fvcomtoolbox/custom/']);
     addpath([basedir,'fvcomtoolbox/utilities/']);
 elseif isunix	% Unix?
@@ -23,7 +23,6 @@ end
 %%%                          INPUT CONFIGURATION
 %%%------------------------------------------------------------------------
 
-
 mat1 = load('ncfile_01.mat');
 ncfile = mat1.ncfile;
 clear mat1;
@@ -38,4 +37,3 @@ ncfile.DYE_AGE = cat(3,ncfile.DYE_AGE, mat2.ncfile.DYE_AGE(:,:,2:end));
 save('ncfile.mat','ncfile','-v7.3','-nocompression');
 delete 'ncfile_01.mat';
 delete 'ncfile_02.mat';
-
