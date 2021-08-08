@@ -1,0 +1,34 @@
+#!/bin/bash
+
+cd /home/usr0/n70110d/paper_case2/0001/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0002/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0003/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0004/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0301/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0302/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0303/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/0304/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/1001/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/1002/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/1003/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/1004/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/2001/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/2002/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/2003/run
+pjsub exempi.sh
+cd /home/usr0/n70110d/paper_case2/2004/run
+pjsub exempi.sh
