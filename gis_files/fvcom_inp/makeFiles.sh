@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0001/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0002/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0003/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0004/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0301/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0302/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0303/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/0304/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1001/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1002/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1003/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/1004/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/2001/inp
+#sh ./makeFile.sh
+#cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/2002/inp
+#sh ./makeFile.sh
+cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/2003/inp
+sh ./makeFile.sh
+cd /Users/yulong/GitHub/study_case2/gis_files/fvcom_inp/2004/inp
+sh ./makeFile.sh
