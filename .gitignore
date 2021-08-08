@@ -4,3 +4,5 @@ gis_files/dem_1.0/dem_contour.shp
 gis_files/dem_2.0/dem_contour.shp
 gis_files/dem_0.3/dem_contour.shp
 gis_files/dem_orig/depth_0030_contour.shp
+*.log
+fvcom_files/*/run/exempi.sh.*
