@@ -7,4 +7,3 @@ gis_files/dem_orig/depth_0030_contour.shp
 *.log
 fvcom_files/*/run/exempi.sh.*
 fvcom_files/*/run/fvcom_case
-fvcom_files/*/*/diary
