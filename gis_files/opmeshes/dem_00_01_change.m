@@ -35,7 +35,7 @@ y_bond_01 = [35.859592	 35.225989	35.182486  35.139579  35.097818 ...
     34.983607  35.019512  35.057672  35.097818 35.139579 ...
     35.182486  35.225989  35.859592	 35.859592];
 bbox_01       = [x_bond_01',y_bond_01'];
-min_el_01    = 1e3;  	   % minimum resolution in meters.
+min_el_01    = 9e2;  	   % minimum resolution in meters.
 max_el_01    = 20e3; 	   % maximum resolution in meters. 
 wl_01        = 30;         % 60 elements resolve M2 wavelength.
 dt_01        = 0;          % Automatically set timestep based on nearshore res
@@ -63,7 +63,7 @@ fh_01 = edgefx('geodata',gdat_01,...
              'dt',dt_01,'g',grade_01);
           
 %% Repeat STEPS 1-3 for a high resolution domain for High Res New York Part
-min_el_02    = 6e2;  		% minimum resolution in meters.
+min_el_02    = 10e2;  		% minimum resolution in meters.
 max_el_02    = 30e2; 		% maximum resolution in meters. 
 wl_02        = 10;
 dt_02        = 0;
@@ -95,7 +95,7 @@ fh_02 = edgefx('geodata',gdat_02,...
                'dt',dt_02,'g',grade_02);
            
 %% Repeat STEPS 1-3 for a high resolution domain for High Res New York Part
-min_el_03    = 2e2;  		% minimum resolution in meters.
+min_el_03    = 6e2;  		% minimum resolution in meters.
 max_el_03    = 15e2; 		% maximum resolution in meters. 
 wl_03        = 10;
 dt_03        = 0;
@@ -105,7 +105,6 @@ slp_03       = 50;         % 2*pi/number of elements to resolve slope
 fl_03        = -10;
 
 coastline_03 = 'C23-06_TOKYOBAY_INNER'; 
-% dem_03       = 'depth_0010-16+17+18+19+20+21+22+23.nc';
 dem_03       = 'dem_00_01_change.nc';
 
 x_bond_03 = [139.6186 139.7978 140.1562 140.1590 139.9604 ...
@@ -115,7 +114,6 @@ y_bond_03 = [35.5562 35.7823 35.7849 35.4909 35.2584 ...
              35.2584 35.3126 35.3127 35.2562 35.2562 ...
              35.2763 35.5562];
 bbox_03      = [x_bond_03',y_bond_03'];
-bbox         = {bbox_01,bbox_03,bbox_03};
 
 gdat_03 = geodata('shp',coastline_03,...
                   'dem',dem_03,...
@@ -140,15 +138,11 @@ mshopts = mshopts.build;
 
 %% Plot and save the msh class object/write to fort.14
 m = mshopts.grd; % get out the msh object
-m = interp(m,{gdat_01 gdat_02 gdat_03},'mindepth',1); % interpolate bathy to the mesh with minimum depth of 1 m
-m = make_bc(m,'auto',gdat_01,'depth',80); 
-% m = make_bc(m,'auto',gdat_01,'both');               % make the nodestring boundary conditions
-% m = make_bc(m,'auto',gdat_01,'distance',60);
-% m = make_bc(m,'auto',gdat_01);
+m = interp(m,{gdat_01 gdat_02 gdat_03},'mindepth',0.05); % interpolate bathy to the mesh with minimum depth of 1 m
+m = make_bc(m,'auto',gdat_01);               % make the nodestring boundary conditions
+% m = make_bc(m,'auto',gdat_01,'depth',20);
 plot(m,'bd',1); % plot on native projection with nodestrings
 plot(m,'b',1); % plot bathy on native projection
-plot(m,'reso',1,[],[],[10, 100 3e3]) % plot the resolution
-plot(m,'resodx',1,[],[],[10, 100 3e3]) % plot the relaxation rate
-plot(m,'slp',1,[],[],[10, 100 3e3]) % plot the slope
+plot(m,'reso',1,[],[],[10, 0 10e3]) % plot the resolution
 save('dem_00_01_change.mat','m'); 
 write(m,'dem_00_01_change');

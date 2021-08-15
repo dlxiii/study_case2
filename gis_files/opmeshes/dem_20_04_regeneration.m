@@ -63,8 +63,8 @@ fh_01 = edgefx('geodata',gdat_01,...
              'dt',dt_01,'g',grade_01);
           
 %% Repeat STEPS 1-3 for a high resolution domain for High Res New York Part
-min_el_02    = 6e2;  		% minimum resolution in meters.
-max_el_02    = 30e2; 		% maximum resolution in meters. 
+min_el_02    = 10e2;  		% minimum resolution in meters.
+max_el_02    = 30e2; 	   % maximum resolution in meters. 
 wl_02        = 10;
 dt_02        = 0;
 grade_02     = 0.35;       % mesh grade in decimal percent. 
@@ -95,7 +95,7 @@ fh_02 = edgefx('geodata',gdat_02,...
                'dt',dt_02,'g',grade_02);
            
 %% Repeat STEPS 1-3 for a high resolution domain for High Res New York Part
-min_el_03    = 2e2;  		% minimum resolution in meters.
+min_el_03    = 6e2;  		% minimum resolution in meters.
 max_el_03    = 15e2; 		% maximum resolution in meters. 
 wl_03        = 10;
 dt_03        = 0;
