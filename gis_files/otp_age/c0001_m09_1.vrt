@@ -1,8 +1,0 @@
-<OGRVRTDataSource><OGRVRTLayer name='c0001_m09_1'>
-        <SrcLayer>c0001_m09_1</SrcLayer>
-        <LayerSRS>EPSG:4326</LayerSRS>
-        <SrcDataSource>c0001_m09_1.csv</SrcDataSource>
-        <GeometryType>wkbPoint</GeometryType>
-        <GeometryField encoding="PointFromColumns" x="field_1" y="field_2" z="field_3"/>
-    </OGRVRTLayer>
-</OGRVRTDataSource>
