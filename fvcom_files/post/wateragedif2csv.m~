@@ -26,11 +26,11 @@ formatSpec = '%02i';
 td = load("./wa_dif.mat");
 wa_dif = td.wa_dif;
 clear td;
-csv_resol = 500;
 
 %% present monthly layers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+csv_resol = 1000;
 layerlist = [1,8,16];
 month = {'m09','m10','m11','m12',...
     'm01','m02','m03','m04','m05','m06',...
@@ -40,6 +40,9 @@ caselist = {'c0001',...
     'c1001','c1003',...
     'c2001','c2003'};
 % c=1;l=1;layer=layerlist(l);m = 1;
+otfile_bash = ['../../csv_files/multi_run.sh'];
+fileID0 = fopen(otfile_bash,'w');
+fprintf(fileID0,'#!/bin/bash\n');
 for c = 1:length(caselist)
     for l = 1:length(layerlist)
         layer = layerlist(l);
@@ -81,7 +84,8 @@ for c = 1:length(caselist)
             otfile_vrt = ['../../csv_files/',...
                  filename,'.vrt'];
             fileID = fopen(otfile_vrt,'w');
-            fprintf(fileID,'<OGRVRTDataSource><OGRVRTLayer name="%s">\n',filename);
+            fprintf(fileID,'<OGRVRTDataSource>\n');
+            fprintf(fileID,'    <OGRVRTLayer name="%s">\n',filename);
             fprintf(fileID,'        <SrcLayer>%s</SrcLayer>\n',filename);
             fprintf(fileID,'        <LayerSRS>EPSG:4326</LayerSRS>\n');
             fprintf(fileID,'        <SrcDataSource>CSV:%s.csv</SrcDataSource>\n',filename);
@@ -92,12 +96,15 @@ for c = 1:length(caselist)
             fclose(fileID);
  
             % Create bash
-            otfile_vrt = ['../../csv_files/',...
+            otfile_sh = ['../../csv_files/',...
                  filename,'.sh'];
-            fileID = fopen(otfile_vrt,'w');
+            fileID = fopen(otfile_sh,'w');
             fprintf(fileID,'#!/bin/bash\n');
-            fprintf(fileID,'gdal_grid -l %s -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=%d:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff %s.vrt %s.tif\n',filename,csv_resol*1.2,filename,filename);
+            fprintf(fileID,'gdal_grid -l %s -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=%f:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff %s.vrt %s.tif\n',filename,csv_resol*1.2,filename,filename);
             fclose(fileID);
+            
+            % Create bash
+            fprintf(fileID0,'sh ./%s.sh\n',filename);
             
             %{
             % Create figure
@@ -141,4 +148,30 @@ for c = 1:length(caselist)
             %}
         end
     end
+end
+fclose(fileID0);
+
+%% present annual layers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+csv_resol = 100;
+layerlist = [1,8,16];
+mmean = {'m00'};
+month = {'m09','m10','m11','m12',...
+    'm01','m02','m03','m04','m05','m06',...
+    'm07','m08'};
+caselist = {'c0001',...
+    'c0301','c0303',...
+    'c1001','c1003',...
+    'c2001','c2003'};
+
+% f = 1;m = 1;
+for f = 1:length(caselist)
+    wa_dif.(caselist{f}).m00 = 0;
+    for m = 1:length(month)
+        wa_dif.(caselist{f}).m00 = ...
+            wa_dif.(caselist{f}).m00 + ...
+            wa_dif.(caselist{f}).(month{m});
+    end
+    wa_dif.(caselist{f}).m00 = wa_dif.(caselist{f}).m00 /12;
 end
