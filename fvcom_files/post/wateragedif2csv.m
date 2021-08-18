@@ -41,7 +41,9 @@ caselist = {'c0001',...
     'c2001','c2003'};
 % c=1;l=1;layer=layerlist(l);m = 1;
 otfile_bash = ['../../csv_files/multi_run_m.sh'];
+info_file = ['../../csv_files/info_month_layers.csv'];
 fileID0 = fopen(otfile_bash,'w');
+fileID1 = fopen(info_file,'w');
 fprintf(fileID0,'#!/bin/bash\n');
 for c = 1:length(caselist)
     for l = 1:length(layerlist)
@@ -79,6 +81,13 @@ for c = 1:length(caselist)
                     M(i,1),',',M(i,2),',',M(i,3),',');
             end
             fclose(fileID);
+            
+            % average value in polygen
+            x = M(:,1); y = M(:,2); z = M(:,3); 
+            shp_path = '/Users/yulong/GitHub/study_case2/gis_files/others/boundary_innerbay.shp';
+            [~,~,val_age] = valInPol(x,y,z,shp_path);
+            fprintf(fileID1,'%s%1s %5.2f%1s\n',...
+                    filename,',',nanmean(val_age),','); 
             
             % Create vrt
             otfile_vrt = ['../../csv_files/',...
@@ -150,6 +159,7 @@ for c = 1:length(caselist)
     end
 end
 fclose(fileID0);
+fclose(fileID1);
 
 %% present annual layers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
