@@ -24,16 +24,16 @@ end
 %%%------------------------------------------------------------------------
 
 mat1 = load('ncfile_01.mat');
-ncfile = mat1.ncfile;
+nc = mat1.ncfile;
 clear mat1;
 mat2 = load('ncfile_02.mat');
 
-ncfile.time  = cat(1,ncfile.time, mat2.ncfile.time(2:end,:));
-ncfile.Times = cat(1,ncfile.Times, mat2.ncfile.Times(2:end,:));
-ncfile.age   = cat(3,ncfile.age, mat2.ncfile.age(:,:,2:end));
-ncfile.DYE   = cat(3,ncfile.DYE, mat2.ncfile.DYE(:,:,2:end));
-ncfile.DYE_AGE = cat(3,ncfile.DYE_AGE, mat2.ncfile.DYE_AGE(:,:,2:end));
+nc.time  = cat(1,nc.time, mat2.ncfile.time(2:end,:));
+nc.Times = cat(1,nc.Times, mat2.ncfile.Times(2:end,:));
+nc.age   = cat(3,nc.age, mat2.ncfile.age(:,:,2:end));
+nc.DYE   = cat(3,nc.DYE, mat2.ncfile.DYE(:,:,2:end));
+nc.DYE_AGE = cat(3,nc.DYE_AGE, mat2.ncfile.DYE_AGE(:,:,2:end));
 
-save('ncfile.mat','ncfile','-v7.3','-nocompression');
+save('ncfile.mat','nc','-v7.3','-nocompression');
 delete 'ncfile_01.mat';
 delete 'ncfile_02.mat';

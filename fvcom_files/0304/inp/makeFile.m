@@ -22,7 +22,7 @@ develop_mode = 2;
 % Which system am I using?
 if ismac    % On Mac
     basedir = '/Users/yulong/GitHub/';
-    basedir2 = '/Volumes/Yulong/GitHub/';
+    basedir2 = '/Volumes/Yulong/';
     addpath([basedir,'fvcomtoolbox/']);
     addpath([basedir,'fvcomtoolbox/fvcom_prepro/']);
     addpath([basedir,'fvcomtoolbox/utilities/']);
@@ -30,9 +30,8 @@ if ismac    % On Mac
     addpath([basedir,'TMD/']);
     addpath([basedir,'TMD/FUNCTIONS/']);
     addpath([basedir,'TMD/DATA/']);
-    addpath([basedir2,'paper_case2/fvcom_inp/datasets/']);
-    addpath([basedir2,'paper_case2/fvcom_inp/datasets/gwo/']);
-    addpath([basedir2,'paper_case2/fvcom_inp/datasets/RiverDischarge/']);
+    addpath([basedir2,'GitHub/paper_case/gwo/']);
+    addpath([basedir2,'GitHub/paper_case/RiverDischarge/']);
 elseif isunix       % Unix?
     basedir = '/home/usr0/n70110d/';
     addpath([basedir,'github/fvcomtoolbox/']);
@@ -57,19 +56,16 @@ elseif ispc     % Or Windows?
 end
 
 % Output directory: dat and nc files.
-inputConf.outbase = [basedir2,'paper_case2/fvcom_inp/0304/inp/'];
+inputConf.outbase = pwd;
 
 % Write out all the required files.
 % Make the output directory if it doesnt exist
 if exist(inputConf.outbase, 'dir')~=7
     mkdir(inputConf.outbase)
 end
-if exist([inputConf.outbase,'varb/'], 'dir')~=7
-    mkdir([inputConf.outbase,'varb/'])
-end
 
 % Working directory: grads folder and current folder
-% inputConf.base = [basedir,'casesets/'];
+inputConf.base = [basedir,'casesets/'];
 
 % Write out diary file.
 % Clear the diary file if it does exist.
@@ -87,8 +83,7 @@ diary on;
 inputConf.FVCOM_version = '4.1';
 
 % Location of grads file
-inputConf.grid = [basedir,'/study_case2/gis_files/opmeshes/',...
-    'dem_03_04_regeneration.14'];
+inputConf.grid = ['case_02_tokyobay.14'];
 
 %%%------------------------------------------------------------------------
 %%%                           Spatial stuff
@@ -350,8 +345,45 @@ if strcmpi(inputConf.smoothBathy, 'yes')
     % smoothfield2 is really inappropriate for bathymetry data.
     % Mobj.h = smoothfield2(Mobj.h,Mobj,inputconf.smoothFactors(2));
     Mobj.h_delta = Mobj.h - Mobj.h_backup_1;
-    plotMesh(01, [Mobj.lon, Mobj.lat], Mobj.tri, Mobj.h_delta);
+    % plotMesh(01, [Mobj.lon, Mobj.lat], Mobj.tri, Mobj.h_delta);
+    plotMesh(01, [Mobj.lon, Mobj.lat], Mobj.tri, Mobj.h);
 end
+
+% Change elevation manually on specific points
+Mobj.h_backup_3 = Mobj.h;
+Mobj.h = Mobj.h + 0.3;
+
+% tidal flats
+mod0.shpfile = "/Users/yulong/GitHub/study_case2/gis_files/grd_mod/0003_box.shp";
+mod0.s = shaperead(mod0.shpfile);
+% mapshow(mod1.s);
+mod0.x = [mod0.s.X];
+mod0.y = [mod0.s.Y];
+[mod0.in_p,~] = inpolygon(Mobj.lon,Mobj.lat,mod0.x,mod0.y);
+plot(Mobj.lon(mod0.in_p),Mobj.lat(mod0.in_p),'b+');
+Mobj.h(mod0.in_p) = Mobj.h(mod0.in_p) - 0.3;
+
+% -5 meter
+mod1.shpfile = "/Users/yulong/GitHub/study_case2/gis_files/grd_mod/0001_box.shp";
+mod1.s = shaperead(mod1.shpfile);
+% mapshow(temp.s);
+mod1.x = [mod1.s.X];
+mod1.y = [mod1.s.Y];
+[mod1.in_p,~] = inpolygon(Mobj.lon,Mobj.lat,mod1.x,mod1.y);
+plot(Mobj.lon(mod1.in_p),Mobj.lat(mod1.in_p),'g+');
+Mobj.h(mod1.in_p) = 5.000;
+
+hold on;
+
+% 2 meter
+mod2.shpfile = "/Users/yulong/GitHub/study_case2/gis_files/grd_mod/0001_box_ele.shp";
+mod2.s = shaperead(mod2.shpfile);
+% mapshow(temp.s);
+mod2.x = [mod2.s.X];
+mod2.y = [mod2.s.Y];
+[mod2.in_p,~] = inpolygon(Mobj.lon,Mobj.lat,mod2.x,mod2.y);
+plot(Mobj.lon(mod2.in_p),Mobj.lat(mod2.in_p),'r+');
+Mobj.h(mod2.in_p) = -0.100;
 
 % % Parse the open boundary nodes and add accordingly
 % % Add the sponge nodes
@@ -459,10 +491,10 @@ write_FVCOM_z0(Mobj.z0,fullfile(inputConf.outbase,[inputConf.casename,'_z0.nc'])
 write_FVCOM_stations(Mobj,fullfile(inputConf.outbase,[inputConf.casename,'_station.dat']));
 
 % Save Model object file
-if exist([inputConf.outbase,'varb'], 'dir')~=7
-    mkdir([inputConf.outbase,'varb'])
+if exist('varb', 'dir')~=7
+    mkdir('varb')
 end
-save([inputConf.outbase,'varb/Mobj_00.mat'],'Mobj','-v7.3','-nocompression');
+save('varb/Mobj_00.mat','Mobj','-v7.3','-nocompression');
 
 %%
 %%%------------------------------------------------------------------------
@@ -520,7 +552,7 @@ if strcmpi(inputConf.obcForcing, 'z')
     if develop_mode == 3
         cd(here);
     	fprintf('Loading Model objet file...\n');
-        load([inputConf.outbase,'varb/Mobj_01.mat']);
+        load('varb/Mobj_01.mat');
         fprintf('Done!\n');
     else
         % Use tmd_tide_pred to predict surface elevations for a given time range.
@@ -572,7 +604,7 @@ if strcmpi(inputConf.obcForcing, 'z')
         % Tidy up some more
         clear i j tIndUse obc_lat obc_lon currLon currLat surfaceElevation
         cd(here);
-        save([inputConf.outbase,'varb/Mobj_01.mat'],'Mobj','-v7.3','-nocompression');
+        save('varb/Mobj_01.mat','Mobj','-v7.3','-nocompression');
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % TEST CODE
         % t.Model = '/home/usr0/n70110d/github/fvcomtoolbox/tmd/DATA/Model_OhS'
@@ -587,7 +619,7 @@ if strcmpi(inputConf.obcForcing, 'z')
 elseif strcmpi(inputConf.obcForcing, 'otps')
     if develop_mode == 3
     	fprintf('Loading Model objet file...\n');
-        load([inputConf.outbase,'varb/Mobj_01.mat']);
+        load('varb/Mobj_01.mat');
         fprintf('Done!\n');
     else
         surfaceElevation = nan(Mobj.nObcNodes, size(inputConf.tidesMJD, 2), length(inputConf.boundaryNames));
@@ -607,13 +639,13 @@ elseif strcmpi(inputConf.obcForcing, 'otps')
         Mobj.surfaceElevation = surfaceElevation;
         % Tidy up some more
         clear i j k m n filename variable TimeSeries SerialDay surfaceElevation
-        save([inputConf.outbase,'varb/Mobj_01.mat'],'Mobj','-v7.3','-nocompression');
+        save('varb/Mobj_01.mat','Mobj','-v7.3','-nocompression');
     end
 elseif strcmpi(inputConf.obcForcing,'phase-amp')
     if develop_mode == 3
         cd(here);
     	fprintf('Loading Model objet file...\n');
-        load([inputConf.outbase,'varb/Mobj_01.mat']);
+        load('varb/Mobj_01.mat');
         fprintf('Done!\n');
     else
         % Boundary conditions from TPXO (for spectral tides or predicted
@@ -718,7 +750,7 @@ elseif strcmpi(inputConf.obcForcing,'phase-amp')
                 axis('equal','tight');
             end
         end
-        save([inputConf.outbase,'varb/Mobj_01.mat'],'Mobj','-v7.3','-nocompression');
+        save('varb/Mobj_01.mat','Mobj','-v7.3','-nocompression');
     end
 end
 clear tpxo_dir;
@@ -759,7 +791,7 @@ if strcmpi('HYCOM', {inputConf.obc_temp, inputConf.obc_salt})
     % Offset the times to give us a bit of wiggle room.
     if develop_mode == 3
     	fprintf('Loading Model objet file...\n')
-        load([inputConf.outbase,'varb/Mobj_02.mat']);
+        load('varb/Mobj_02.mat');
         fprintf('Done!\n');
     else
     	if develop_mode == 1
@@ -880,7 +912,7 @@ if strcmpi('HYCOM', {inputConf.obc_temp, inputConf.obc_salt})
             % Depth averaged velocity
             Mobj.velocity = squeeze(mean(sqrt(Mobj.meanflow_u.^2 + Mobj.meanflow_v.^2), 2));
         end
-        save([inputConf.outbase,'varb/Mobj_02.mat'],'Mobj','-v7.3','-nocompression');
+        save('varb/Mobj_02.mat','Mobj','-v7.3','-nocompression');
     end
 elseif strcmpi('FRA-JCOPE', {inputConf.obc_temp, inputConf.obc_salt})
     % [data,header]=read_grads(file_name,var_name,varargin)
@@ -943,8 +975,8 @@ if strcmpi(inputConf.doForcing, 'NCEP')
 
     if develop_mode == 3
     	fprintf('Loading Model objet file...\n')
-        load([inputConf.outbase,'varb/Mobj_03.mat']);
-        load([inputConf.outbase,'varb/forcing_interp.mat']);
+        load('varb/Mobj_03.mat');
+        load('varb/forcing_interp.mat');
         fprintf('Done!\n');
     else
     	if develop_mode == 1
@@ -990,7 +1022,7 @@ if strcmpi(inputConf.doForcing, 'NCEP')
         	    forcing_ncep = rmfield(forcing_ncep, {'domain_rows_alt', 'domain_cols_alt'});
         	end
         	fprintf('Saving NCEP forcing from OPeNDAP server database...')
-        	save([inputConf.outbase,'forcing_ncep.mat'],'forcing_ncep','-v7.3','-nocompression');
+        	save('forcing_ncep.mat','forcing_ncep','-v7.3','-nocompression');
         	fprintf('Done\n')
             % % Have a look at some data.
             %{
@@ -1025,7 +1057,7 @@ if strcmpi(inputConf.doForcing, 'NCEP')
             %}
         elseif develop_mode == 2
     		fprintf('Loading NCEP forcing from the local database...');
-        	load([inputConf.outbase,'forcing_ncep.mat']);
+        	load('forcing_ncep.mat');
         	fprintf('Done!\n');
     	end
         % Interpolate the data onto the FVCOM unstructured grid.
@@ -1091,9 +1123,9 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
     
     if develop_mode == 3
     	fprintf('Loading Model objet file...\n')
-        load([inputConf.outbase,'varb/Mobj_03.mat']);
+        load('varb/Mobj_03.mat');
         % load('forcing_gwo.mat');
-        load([inputConf.outbase,'forcing_gwo_interp.mat']);
+        load('forcing_gwo_interp.mat');
         fprintf('Done!\n');
     else
         Mobj.gwo.time = inputConf.forceMJD';
@@ -1107,12 +1139,11 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
             end
             [forcing_gwo.x,forcing_gwo.y] = meshgrid(forcing_gwo.x,forcing_gwo.y);
             clear s UTMzone
-            save([inputConf.outbase,'forcing_gwo.mat'],'forcing_gwo','-v7.3','-nocompression');
-            save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
+            save('forcing_gwo.mat','forcing_gwo','-v7.3','-nocompression');
+            save('varb/Mobj_03.mat','Mobj','-v7.3','-nocompression');
         elseif develop_mode == 2
     		fprintf('Loading GWO forcing from the local database...');
         	load('forcing_gwo.mat');
-            save([inputConf.outbase,'varb/Mobj_03.mat'],'Mobj','-v7.3','-nocompression');
         	fprintf('Done!\n');
         end
         % air
@@ -1121,7 +1152,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_air = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_air.mat'],'forcing_gwo_inter_air','-v7.3','-nocompression');
+        save('forcing_gwo_inter_air.mat','forcing_gwo_inter_air','-v7.3','-nocompression');
         clear forcing_gwo_inter_air;
         
         % cld
@@ -1130,7 +1161,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_cld = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_cld.mat'],'forcing_gwo_inter_cld','-v7.3','-nocompression');
+        save('forcing_gwo_inter_cld.mat','forcing_gwo_inter_cld','-v7.3','-nocompression');
         clear forcing_gwo_inter_cld;
         
         % dsw
@@ -1139,7 +1170,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_dsw = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_dsw.mat'],'forcing_gwo_inter_dsw','-v7.3','-nocompression');
+        save('forcing_gwo_inter_dsw.mat','forcing_gwo_inter_dsw','-v7.3','-nocompression');
         clear forcing_gwo_inter_dsw;
         
         % hum
@@ -1148,7 +1179,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_hum = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_hum.mat'],'forcing_gwo_inter_hum','-v7.3','-nocompression');
+        save('forcing_gwo_inter_hum.mat','forcing_gwo_inter_hum','-v7.3','-nocompression');
         clear forcing_gwo_inter_hum;
         
         % prs
@@ -1157,7 +1188,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_prs = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_prs.mat'],'forcing_gwo_inter_prs','-v7.3','-nocompression');
+        save('forcing_gwo_inter_prs.mat','forcing_gwo_inter_prs','-v7.3','-nocompression');
         clear forcing_gwo_inter_prs;
         
         % wnd
@@ -1166,7 +1197,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing_gwo;
         forcing_gwo_inter_wnd = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', true);
-        save([inputConf.outbase,'forcing_gwo_inter_wnd.mat'],'forcing_gwo_inter_wnd','-v7.3','-nocompression');
+        save('forcing_gwo_inter_wnd.mat','forcing_gwo_inter_wnd','-v7.3','-nocompression');
         clear forcing_gwo_inter_wnd;
         
         % rin
@@ -1175,18 +1206,18 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         % vars = interpfields; data = forcing;
         forcing_gwo_inter_rin = grid2fvcom(Mobj, interpfields, forcing_gwo,...
             'add_elems', false);
-        save([inputConf.outbase,'forcing_gwo_inter_rin.mat'],'forcing_gwo_inter_rin','-v7.3','-nocompression');
+        save('forcing_gwo_inter_rin.mat','forcing_gwo_inter_rin','-v7.3','-nocompression');
         clear forcing_gwo_inter_rin;
         clear forcing_gwo;
         clear interpfields;
         
-        load([inputConf.outbase,'forcing_gwo_inter_air.mat']); forcing_gwo_interp.air = forcing_gwo_inter_air.air; clear forcing_gwo_inter_air;
-        load([inputConf.outbase,'forcing_gwo_inter_cld.mat']); forcing_gwo_interp.cld = forcing_gwo_inter_cld.cld; clear forcing_gwo_inter_cld;
-        load([inputConf.outbase,'forcing_gwo_inter_dsw.mat']); forcing_gwo_interp.dsw = forcing_gwo_inter_dsw.dsw; clear forcing_gwo_inter_dsw;
-        load([inputConf.outbase,'forcing_gwo_inter_hum.mat']); forcing_gwo_interp.hum = forcing_gwo_inter_hum.hum; clear forcing_gwo_inter_hum;
-        load([inputConf.outbase,'forcing_gwo_inter_prs.mat']); forcing_gwo_interp.prs = forcing_gwo_inter_prs.prs; clear forcing_gwo_inter_prs;
-        load([inputConf.outbase,'forcing_gwo_inter_rin.mat']); forcing_gwo_interp.rin = forcing_gwo_inter_rin.rin; clear forcing_gwo_inter_rin;
-        load([inputConf.outbase,'forcing_gwo_inter_wnd.mat']); 
+        load('forcing_gwo_inter_air.mat'); forcing_gwo_interp.air = forcing_gwo_inter_air.air; clear forcing_gwo_inter_air;
+        load('forcing_gwo_inter_cld.mat'); forcing_gwo_interp.cld = forcing_gwo_inter_cld.cld; clear forcing_gwo_inter_cld;
+        load('forcing_gwo_inter_dsw.mat'); forcing_gwo_interp.dsw = forcing_gwo_inter_dsw.dsw; clear forcing_gwo_inter_dsw;
+        load('forcing_gwo_inter_hum.mat'); forcing_gwo_interp.hum = forcing_gwo_inter_hum.hum; clear forcing_gwo_inter_hum;
+        load('forcing_gwo_inter_prs.mat'); forcing_gwo_interp.prs = forcing_gwo_inter_prs.prs; clear forcing_gwo_inter_prs;
+        load('forcing_gwo_inter_rin.mat'); forcing_gwo_interp.rin = forcing_gwo_inter_rin.rin; clear forcing_gwo_inter_rin;
+        load('forcing_gwo_inter_wnd.mat'); 
         forcing_gwo_interp.uwnd = forcing_gwo_inter_wnd.uwnd; 
         forcing_gwo_interp.vwnd = forcing_gwo_inter_wnd.vwnd; 
         forcing_gwo_interp.time = forcing_gwo_inter_wnd.time;
@@ -1196,7 +1227,7 @@ elseif strcmpi(inputConf.doForcing, 'GWO')
         forcing_gwo_interp.y    = forcing_gwo_inter_wnd.y; 
         clear forcing_gwo_inter_wnd;
         
-        save([inputConf.outbase,'forcing_gwo_interp.mat'],'forcing_gwo_interp','-v7.3','-nocompression');
+        save('forcing_gwo_interp.mat','forcing_gwo_interp','-v7.3','-nocompression');
     end
 
     write_FVCOM_gwo_forcing(Mobj, ...
@@ -1239,7 +1270,7 @@ end
 if strcmpi(inputConf.riverForcing, 'FLUX')
     if develop_mode == 3
     	fprintf('Loading Model objet file...')
-        load([inputConf.outbase,'varb/Mobj_04.mat']);
+        load('varb/Mobj_04.mat');
         fprintf('Done!\n');
     else
         fprintf('Reading river forcing file...');
@@ -1262,7 +1293,7 @@ if strcmpi(inputConf.riverForcing, 'FLUX')
         end
         clear node elem inc s
         Mobj = add_river_nodes_list(Mobj,Mobj.riverList,Mobj.river.name,1);
-        save([inputConf.outbase,'varb/Mobj_04.mat'],'Mobj','-v7.3','-nocompression');
+        save('varb/Mobj_04.mat','Mobj','-v7.3','-nocompression');
         fprintf('Done!\n');
         clear riverList;
     end

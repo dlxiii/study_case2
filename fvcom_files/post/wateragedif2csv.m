@@ -177,7 +177,9 @@ for f = 1:length(caselist)
 end
 
 otfile_bash = ['../../csv_files/multi_run_a.sh'];
+info_file = ['../../csv_files/info_annual_layers.csv'];
 fileID0 = fopen(otfile_bash,'w');
+fileID1 = fopen(info_file,'w');
 fprintf(fileID0,'#!/bin/bash\n');
 fprintf(fileID0,'# source /home/usr0/n70110d/usr/local/anaconda3/2019.03.py3/etc/profile.d/conda.sh\n');
 fprintf(fileID0,'# conda activate gdal\n');
@@ -219,6 +221,13 @@ for c = 1:length(caselist)
             end
             fclose(fileID);
             
+            % average value in polygen
+            x = M(:,1); y = M(:,2); z = M(:,3); 
+            shp_path = '/Users/yulong/GitHub/study_case2/gis_files/others/boundary_innerbay.shp';
+            [~,~,val_age] = valInPol(x,y,z,shp_path);
+            fprintf(fileID1,'%s%1s %5.2f%1s\n',...
+                    filename,',',nanmean(val_age),',');  
+            
             % Create vrt
             otfile_vrt = ['../../csv_files/',...
                  filename,'.vrt'];
@@ -250,6 +259,7 @@ for c = 1:length(caselist)
     end
 end
 fclose(fileID0);
+fclose(fileID1);
 
 %% present annual layer average
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -275,7 +285,9 @@ for f = 1:length(caselist)
 end
 
 otfile_bash = ['../../csv_files/multi_run_ava.sh'];
+info_file = ['../../csv_files/info_annual_vertical.csv'];
 fileID0 = fopen(otfile_bash,'w');
+fileID1 = fopen(info_file,'w');
 fprintf(fileID0,'#!/bin/bash\n');
 %fprintf(fileID0,'# source /home/usr0/n70110d/usr/local/anaconda3/2019.03.py3/etc/profile.d/conda.sh\n');
 fprintf(fileID0,'# conda activate gis_gdal\n');
@@ -317,6 +329,13 @@ for c = 1:length(caselist)
             end
             fclose(fileID);
             
+            % average value in polygen
+            x = M(:,1); y = M(:,2); z = M(:,3); 
+            shp_path = '/Users/yulong/GitHub/study_case2/gis_files/others/boundary_innerbay.shp';
+            [~,~,val_age] = valInPol(x,y,z,shp_path);
+            fprintf(fileID1,'%s%1s %5.2f%1s\n',...
+                    filename,',',nanmean(val_age),',');                
+         
             % Create vrt
             otfile_vrt = ['../../csv_files/',...
                  filename,'.vrt'];
@@ -340,7 +359,7 @@ for c = 1:length(caselist)
             fprintf(fileID,'gdal_grid -l %s -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=%f:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff %s.vrt %s.tif --config GDAL_NUM_THREADS ALL_CPUS\n',filename,csv_resol*1.2,filename,filename);
             fprintf(fileID,'gdal_contour -b 1 -a ELEV -i 1.0 -f "ESRI Shapefile" %s.tif %s.shp\n',filename,filename);
             fclose(fileID);
-            
+             
             % Create bash
             fprintf(fileID0,'sh ./%s.sh\n',filename);
             
@@ -348,3 +367,4 @@ for c = 1:length(caselist)
     end
 end
 fclose(fileID0);
+fclose(fileID1);
