@@ -110,6 +110,7 @@ for c = 1:length(caselist)
             fileID = fopen(otfile_sh,'w');
             fprintf(fileID,'#!/bin/bash\n');
             fprintf(fileID,'gdal_grid -l %s -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=%f:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff %s.vrt %s.tif\n',filename,csv_resol*1.2,filename,filename);
+            fprintf(fileID,'gdal_contour -b 1 -a ELEV -i 1.0 -f "ESRI Shapefile" %s.tif %s.shp\n',filename,filename);
             fclose(fileID);
             
             % Create bash
