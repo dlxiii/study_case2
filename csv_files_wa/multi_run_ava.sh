@@ -1,5 +1,6 @@
 #!/bin/bash
-# conda activate gis_gdal
+source /home/usr0/n70110d/usr/local/anaconda3/2019.03.py3/etc/profile.d/conda.sh
+conda activate gdal
 
 sh ./c0001_m00_va_01.sh
 sh ./c0003_m00_va_01.sh
