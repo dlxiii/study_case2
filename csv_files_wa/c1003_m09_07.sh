@@ -1,0 +1,3 @@
+#!/bin/bash
+gdal_grid -l c1003_m09_07 -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=1200.000000:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff c1003_m09_07.vrt c1003_m09_07.tif
+gdal_contour -b 1 -a ELEV -i 1.0 -f "ESRI Shapefile" c1003_m09_07.tif c1003_m09_07.shp
