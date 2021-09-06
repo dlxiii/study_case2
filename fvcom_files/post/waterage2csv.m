@@ -281,8 +281,11 @@ fclose(fileID1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 csv_resol = 500;
-layerlist = [1];
-mmean = {'m00_va'};
+layerlist = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+mmean = {'m00'};
+month = {'m09','m10','m11','m12',...
+    'm01','m02','m03','m04','m05','m06',...
+    'm07','m08'};
 caselist = {'c0001','c0003',...
     'c0301','c0303',...
     'c1001','c1003',...
@@ -378,6 +381,121 @@ for c = 1:length(caselist)
             fprintf(fileID,'gdal_contour -b 1 -a ELEV -i 1.0 -f "ESRI Shapefile" %s.tif %s.shp\n',filename,filename);
             fclose(fileID);
              
+            % Create bash
+            fprintf(fileID0,'sh ./%s.sh\n',filename);
+            
+        end
+    end
+end
+fclose(fileID0);
+fclose(fileID1);
+
+%% present annual layer average for machine learning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+csv_resol = 500;
+layerlist = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+mmean = {'m00'};
+month = {'m09','m10','m11','m12',...
+    'm01','m02','m03','m04','m05','m06',...
+    'm07','m08'};
+caselist = {'c0001','c0003',...
+    'c0301','c0303',...
+    'c1001','c1003',...
+    'c2001','c2003'};
+% caselist = {'c0004',...
+%     'c2002'};
+% f = 1;m = 1;
+
+for f = 1:length(caselist)
+    wa.(caselist{f}).m00 = 0;
+    for m = 1:length(month)
+        wa.(caselist{f}).m00 = ...
+            wa.(caselist{f}).m00 + ...
+            wa.(caselist{f}).(month{m});
+    end
+    wa.(caselist{f}).m00 = wa.(caselist{f}).m00 / 12;
+end
+
+otfile_bash = ['../../csv_files_ml/multi_run_a.sh'];
+info_file = ['../../csv_files_ml/info_annual_layers.csv'];
+fileID0 = fopen(otfile_bash,'w');
+fileID1 = fopen(info_file,'w');
+fprintf(fileID0,'#!/bin/bash\n');
+fprintf(fileID0,'# source /home/usr0/n70110d/usr/local/anaconda3/2019.03.py3/etc/profile.d/conda.sh\n');
+fprintf(fileID0,'# conda activate gdal\n');
+fprintf(fileID0,'\n');
+for c = 1:length(caselist)
+    for l = 1:length(layerlist)
+        layer = layerlist(l);
+        for m = 1:length(mmean)
+            data1 = double(wa.(caselist{c}).(mmean{m})(:,layer));
+            data1 = filloutliers(data1,'nearest','mean');
+            data_temp.intp = scatteredInterpolant(...
+                wa.lon,...
+                wa.lat,...
+                data1,...
+                'natural');
+            data_temp.lonint = (139.14:(csv_resol/111000):140.39)';
+            data_temp.latint = (34.85:(csv_resol/111000):35.70)';
+            data_temp.ageint = data_temp.intp({data_temp.lonint,data_temp.latint});
+
+            data = data_temp.ageint;
+            data = filloutliers(data,'nearest','mean');
+
+            % Create csv
+            [Y,X] = meshgrid(data_temp.latint,data_temp.lonint);
+            M = [reshape(X,[numel(X),1]),...
+                reshape(Y,[numel(Y),1]),...
+                reshape(data_temp.ageint,[numel(data_temp.ageint),1])];
+            if exist('../../csv_files_ml', 'dir')~=7
+                mkdir('../../csv_files_ml')
+            end
+            filename = [caselist{c},'_',mmean{m},'_',num2str(layer,formatSpec)];
+            otfile_csv = ['../../csv_files_ml/',...
+                 filename,'.csv'];
+            bod_path = '/Users/yulong/GitHub/study_case2/gis_files/others/boundary_outerbay.shp';
+            [tempX,tempY,tempZ] = valInPol(M(:,1),M(:,2),M(:,3),bod_path);
+            temp = [tempX,tempY,tempZ];
+%             fileID = fopen(otfile_csv,'w');
+%             % fprintf(fileID,'%12s %12s %12s\n','lon,','lat,','age,');
+%             for i = 1:length(temp)
+%                 fprintf(fileID,'%11.6f%1s %11.6f%1s %11.2f%1s\n',...
+%                     temp(i,1),',',temp(i,2),',',temp(i,3),',');
+%             end
+%             fclose(fileID);
+            
+            % average value in polygen
+            x = M(:,1); y = M(:,2); z = M(:,3); 
+            shp_path = '/Users/yulong/GitHub/study_case2/gis_files/others/boundary_innerbay.shp';
+            [~,~,val_age] = valInPol(x,y,z,shp_path);
+            fprintf(fileID1,'%s%1s %5.2f%1s\n',...
+                    filename,',',nanmean(val_age),',');  
+            
+            % Create vrt
+            otfile_vrt = ['../../csv_files_ml/',...
+                 filename,'.vrt'];
+            fileID = fopen(otfile_vrt,'w');
+            fprintf(fileID,'<OGRVRTDataSource>\n');
+            fprintf(fileID,'    <OGRVRTLayer name="%s">\n',filename);
+            fprintf(fileID,'        <SrcLayer>%s</SrcLayer>\n',filename);
+            fprintf(fileID,'        <LayerSRS>EPSG:4326</LayerSRS>\n');
+            fprintf(fileID,'        <SrcDataSource>CSV:%s.csv</SrcDataSource>\n',filename);
+            fprintf(fileID,'        <GeometryType>wkbPoint</GeometryType>\n');
+            fprintf(fileID,'        <GeometryField encoding="PointFromColumns" x="field_1" y="field_2" z="field_3"/>\n');
+            fprintf(fileID,'    </OGRVRTLayer>\n');
+            fprintf(fileID,'</OGRVRTDataSource>\n');
+            fclose(fileID);
+ 
+            % Create bash
+            otfile_sh = ['../../csv_files_ml/',...
+                 filename,'.sh'];
+            fileID = fopen(otfile_sh,'w');
+            fprintf(fileID,'#!/bin/bash\n');
+            fprintf(fileID,'gdal_grid -l %s -zfield field_3 -a invdistnn:power=2.0:smothing=0.0:radius=%f:max_points=12:min_points=0:nodata=-9999.0 -ot Float32 -of GTiff %s.vrt %s.tif --config GDAL_NUM_THREADS ALL_CPUS\n',filename,csv_resol*1.2,filename,filename);
+            fprintf(fileID,'gdal_contour -b 1 -a ELEV -i 1.0 -f "ESRI Shapefile" %s.tif %s.shp\n',filename,filename);
+            fclose(fileID);
+            
             % Create bash
             fprintf(fileID0,'sh ./%s.sh\n',filename);
             
