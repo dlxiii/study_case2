@@ -9,3 +9,4 @@ fvcom_files/*/run/exempi.sh.*
 fvcom_files/*/run/fvcom_case
 ml_models/finalized_model.sav
 ml_models/model_rf.sav
+*.m~
