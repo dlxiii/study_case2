@@ -31,7 +31,14 @@ jj = (31+28+31+30+31+30+31+31)*24+1;           % From Sep 2014
 ti = 1;           % Time interval 6 hours.
 start = jj;       % 0*24+1;
 % extent = Inf;     % number or 'Inf'
-extent = (30+31+30+31+31+28+31+30+31+30+31+31)*24+1; % From Sep to Feb
+extent = (30+31+30+31+31+28+31+30+31+30+31+31)*24+1; % From Sep to 
+% only for test
+%%{
+jj = 1;           % From 1/1/2014
+ti = 1;           % Time interval 6 hours.
+start = jj;       % 0*24+1;
+extent = (10)*24+1; % 10 days 
+%%}
 filename = 'ncfile.mat';
 
 %=================================================================================
